@@ -1,39 +1,38 @@
-'use strict';
+const _ = require('lodash');
+const Pizza = require('../models/pizza');
+const ImageStore = require('../lib/imageStore');
 
-const _ = require('lodash'),
-  Pizza = require('../models/pizza'),
-  ImageStore = require('../lib/imageStore'),
-  pizzas = {};
+const pizzas = {};
 
-function createPizza (name, toppings, img, username, callback) {
+function createPizza(name, toppings, img, username, callback) {
   ImageStore.saveImage(name.replace(/ /g, '-'), img, (err, imgUrl) => {
     if (err) throw err;
 
-    let pizza = new Pizza(name, toppings, imgUrl, username);
+    const pizza = new Pizza(name, toppings, imgUrl, username);
     pizzas[pizza.id] = pizza;
     callback(null, pizza);
   });
 }
 
 // for mocks that don't need pizza images saved
-function importPizza (name, toppings, imgUrl, username) {
-  let pizza = new Pizza(name, toppings, imgUrl, username);
+function importPizza(name, toppings, imgUrl, username) {
+  const pizza = new Pizza(name, toppings, imgUrl, username);
   pizzas[pizza.id] = pizza;
 }
 
-function getPizzaForUser (username, callback) {
-  let userPizzas = _.filter(pizzas, (pizza) => {
+function getPizzaForUser(username, callback) {
+  const userPizzas = _.filter(pizzas, (pizza) => {
     return pizza.username === username;
   });
   callback(null, userPizzas);
 }
 
-function getRecentPizzas (callback) {
-  let recentPizzas = _.orderBy(pizzas, ['created'], ['desc']);
+function getRecentPizzas(callback) {
+  const recentPizzas = _.orderBy(pizzas, ['created'], ['desc']);
   callback(null, _.values(recentPizzas).splice(0, 5));
 }
 
-function getPizza (pizzaId, callback) {
+function getPizza(pizzaId, callback) {
   if (!pizzas[pizzaId]) callback('Pizza not found');
   else callback(null, pizzas[pizzaId]);
 }
